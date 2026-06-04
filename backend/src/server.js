@@ -1,0 +1,1 @@
+// only the server and database connection would live here . it's the starting point of any express app.
