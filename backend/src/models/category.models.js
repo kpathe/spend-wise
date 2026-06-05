@@ -15,6 +15,8 @@ const categorySchema = new Schema(
       required: true,
       unique: true,
     },
-  },       
+  },
   { timestamps: true },
 );
+
+export const Category = model("category", categorySchema);
