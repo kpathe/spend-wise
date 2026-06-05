@@ -6,17 +6,21 @@ const categorySchema = new Schema(
       type: String,
       required: true,
       lowercase: true,
-      unique: true,
+      trim : true,
     },
 
     createdBy: {
       type: Schema.Types.ObjectId,
       ref: "User",
       required: true,
-      unique: true,
     },
   },
   { timestamps: true },
 );
 
-export const Category = model("category", categorySchema);
+categorySchema.index(
+  { name: 1, createdBy: 1 },
+  { unique: true }
+);
+
+export const Category = model("Category", categorySchema);

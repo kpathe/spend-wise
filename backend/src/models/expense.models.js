@@ -5,10 +5,12 @@ const expenseSchema = new Schema(
     name: {
       type: String,
       required: true,
+      trim:true,
     },
     amount: {
       type: Number,
       required: true,
+      min : 0,
     },
     transactionType: {
       type: String,
@@ -27,10 +29,10 @@ const expenseSchema = new Schema(
     date: {
       type: Date,
       required: true,
+      default: Date.now,
     },
     note: {
-      types: String,
-      required: false,
+      type: String,
     },
   },
   { timestamps: true },
