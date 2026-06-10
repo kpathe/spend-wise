@@ -55,17 +55,13 @@ const handleUserLogin = asyncHandler(async (req, res) => {
     throw new ApiError(401, "Invalid email or password");
   }
 
-  const isPasswordValid = await user.isPasswordCorrect(password);
+  const passwordMatch = await user.isPasswordCorrect(password);
 
-  if (!isPasswordValid) throw new ApiError(401, "Invalid email or password");
+  if (!passwordMatch) throw new ApiError(401, "Invalid email or password");
 
-  const token = jwt.sign(
-    { userId: user._id, email: user.email },
-    process.env.JWT_SECRET,
-    {
-      expiresIn: "7d",
-    },
-  );
+  const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
+    expiresIn: "7d",
+  });
 
   return res
     .status(200)
@@ -85,7 +81,6 @@ const handleUserLogin = asyncHandler(async (req, res) => {
 });
 
 // logout controller
-
 const handleUserLogout = asyncHandler(async (req, res) => {
   return res
     .clearCookie("token", {
@@ -97,4 +92,38 @@ const handleUserLogout = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, null, "User logged  out"));
 });
 
-export { handleUserSignup, handleUserLogin, handleUserLogout };
+// change password
+const handleChangePassword = asyncHandler(async (req, res) => {
+  const { oldPassword, newPassword } = req.body;
+
+  if (!oldPassword || !newPassword)
+    throw new ApiError(400, "All fields are required");
+
+  if (oldPassword === newPassword)
+    throw new ApiError(400, "Old Password and New Password are same");
+
+  const user = await User.findById(req.user.userId);
+
+  if (!user) {
+    throw new ApiError(404, "User not found");
+  }
+
+  const passwordMatch = await user.isPasswordCorrect(oldPassword);
+
+  if (!passwordMatch) throw new ApiError(402, "Old password invalid");
+
+  user.password = newPassword;
+
+  await user.save();
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, null, "Password updated successfully"));
+});
+
+export {
+  handleUserSignup,
+  handleUserLogin,
+  handleUserLogout,
+  handleChangePassword,
+};
