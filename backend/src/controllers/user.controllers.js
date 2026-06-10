@@ -2,6 +2,7 @@ import { User } from "../models/user.models.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiResponse } from "../utils/apiResponse.js";
 import { ApiError } from "../utils/apiError.js";
+import jwt from "jsonwebtoken";
 
 // signup controller
 const handleUserSignup = asyncHandler(async (req, res) => {
@@ -40,4 +41,47 @@ const handleUserSignup = asyncHandler(async (req, res) => {
   );
 });
 
-export { handleUserSignup };
+// login controller
+const handleUserLogin = asyncHandler(async (req, res) => {
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    throw new ApiError(400, "All fields are required");
+  }
+
+  const user = await User.findOne({ email: email.trim().toLowerCase() });
+
+  if (!user) {
+    throw new ApiError(401, "Invalid email or password");
+  }
+
+  const isPasswordValid = await user.isPasswordCorrect(password);
+
+  if (!isPasswordValid) throw new ApiError(401, "Invalid email or password");
+
+  const token = jwt.sign(
+    { userId: user._id, email: user.email },
+    process.env.JWT_SECRET,
+    {
+      expiresIn: "7d",
+    },
+  );
+
+  return res
+    .status(200)
+    .cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    })
+    .json(
+      new ApiResponse(
+        200,
+        { email: user.email },
+        "User successfully logged in",
+      ),
+    );
+});
+
+export { handleUserSignup, handleUserLogin };
