@@ -113,7 +113,22 @@ const handleEditExpense = asyncHandler(async (req, res) => {
 });
 
 const handleDeleteExpense = asyncHandler(async (req, res) => {
-  const expenseId = req.params.expenseId;
+  const { expenseId } = req.params;
+  const { userId } = req.user;
+
+  if (!mongoose.Types.ObjectId.isValid(expenseId))
+    throw new ApiError(400, "Invalid expense id");
+
+  const expense = await Expense.findOneAndDelete({
+    _id: expenseId,
+    user: userId,
+  });
+
+  if (!expense) throw new ApiError(404, "Expense not found!");
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, expense, "Expense deleted successfully"));
 });
 
-export { handleCreateExpense, handleEditExpense };
+export { handleCreateExpense, handleEditExpense, handleDeleteExpense };
