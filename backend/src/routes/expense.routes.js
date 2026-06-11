@@ -8,8 +8,8 @@ import { Router } from "express";
 
 const expenseRouter = Router();
 
-expenseRouter.post("/create", verifyJWT, handleCreateExpense);
-expenseRouter.patch("/edit/:expenseId", verifyJWT, handleEditExpense);
-expenseRouter.delete("/delete/:expenseId", verifyJWT, handleDeleteExpense);
+expenseRouter.post("/", verifyJWT, handleCreateExpense);
+expenseRouter.patch("/:expenseId", verifyJWT, handleEditExpense);
+expenseRouter.delete("/:expenseId", verifyJWT, handleDeleteExpense);
 
 export default expenseRouter;
