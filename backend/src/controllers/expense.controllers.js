@@ -3,6 +3,7 @@ import { User } from "../models/user.models.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiResponse } from "../utils/apiResponse.js";
 import { ApiError } from "../utils/apiError.js";
+import mongoose from "mongoose";
 
 // create expense
 const handleCreateExpense = asyncHandler(async (req, res) => {
@@ -34,8 +35,21 @@ const handleCreateExpense = asyncHandler(async (req, res) => {
 const handleEditExpense = asyncHandler(async (req, res) => {
   const { name, amount, type, category, date, note } = req.body;
 
-  if (!name && !amount)
-    throw new ApiError(400, "Atleast one field is required");
+  const { expenseId } = req.params;
+
+  const { userId } = req.user;
+
+  const expense = await Expense.findOne({
+    _id: expenseId,
+    user: userId,
+  });
+
+  if (!expense) {
+    throw new ApiError(404, "Expense not found");
+  }
+
+  if (!mongoose.Types.ObjectId.isValid(expenseId))
+    throw new ApiError(400, "Invalid expense ID");
 
   const updates = {};
 
@@ -58,13 +72,16 @@ const handleEditExpense = asyncHandler(async (req, res) => {
   }
 
   if (type !== undefined) {
-    if (type !== "credit" || type !== "debit") {
+    if (type !== "credit" && type !== "debit") {
       throw new ApiError(400, "Enter a valid transaction type");
     }
     updates.transactionType = type;
   }
 
   if (date !== undefined) {
+    if (isNaN(new Date(date).getTime())) {
+      throw new ApiError(400, "Invalid date");
+    }
     updates.date = date;
   }
 
@@ -80,19 +97,23 @@ const handleEditExpense = asyncHandler(async (req, res) => {
     throw new ApiError(400, "No valid fields provided for update");
   }
 
-  const expense = await Expense.findByIdAndUpdate(
-    req.params.expenseId,
+  const updatedExpense = await Expense.findOneAndUpdate(
+    { _id: expenseId, user: userId },
     { $set: updates },
     { new: true },
   );
 
-  if (!expense) throw new ApiError(204, "Error updating expense");
-
-  console.log(expense);
+  if (!expense) throw new ApiError(404, "Error updating expense");
 
   return res
     .status(200)
-    .json(new ApiResponse(200, expense, "Expense updated successfully!"));
+    .json(
+      new ApiResponse(200, updatedExpense, "Expense updated successfully!"),
+    );
+});
+
+const handleDeleteExpense = asyncHandler(async (req, res) => {
+  const expenseId = req.params.expenseId;
 });
 
 export { handleCreateExpense, handleEditExpense };
