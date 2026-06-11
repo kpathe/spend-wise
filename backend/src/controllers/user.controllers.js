@@ -3,7 +3,6 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiResponse } from "../utils/apiResponse.js";
 import { ApiError } from "../utils/apiError.js";
 
-
 // change password
 const handleChangePassword = asyncHandler(async (req, res) => {
   const { oldPassword, newPassword } = req.body;
@@ -32,3 +31,5 @@ const handleChangePassword = asyncHandler(async (req, res) => {
     .status(200)
     .json(new ApiResponse(200, null, "Password updated successfully"));
 });
+
+export { handleChangePassword };
