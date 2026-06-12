@@ -478,7 +478,26 @@ const handleGetExpenses = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, expenses, "Expenses fetched successfully!"));
 });
 
-const handleGetExpenseSummary = asyncHandler();
+const handleGetExpenseSummary = asyncHandler(async (req, res) => {
+  const {
+    period,
+    targetDate,
+    from,
+    to,
+    type,
+    categoryId,
+    search,
+    minAmount,
+    maxAmount,
+    sort,
+    page,
+    limit,
+  } = req.query
+
+return res
+    .status(200)
+    .json(new ApiResponse(200, expensesSummary, "Expenses summary successfully!"));
+});
 
 const handleGetCategoryBreakdown = asyncHandler();
 
