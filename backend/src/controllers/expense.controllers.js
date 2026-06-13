@@ -17,15 +17,17 @@ const handleCreateExpense = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user.userId);
 
   let categoryId;
-  if (category.trim().toLowerCase()) {
-    const searchCategory = await Category.findOne({
-      name: category.trim().toLowerCase(),
-    });
+  if (category && category.trim()) {
+    if (category.trim().toLowerCase()) {
+      const searchCategory = await Category.findOne({
+        name: category.trim().toLowerCase(),
+      });
 
-    if (searchCategory) {
-      categoryId = searchCategory._id;
-    } else {
-      throw new ApiError(404, "Category not found");
+      if (searchCategory) {
+        categoryId = searchCategory._id;
+      } else {
+        throw new ApiError(404, "Category not found");
+      }
     }
   }
 
@@ -39,7 +41,7 @@ const handleCreateExpense = asyncHandler(async (req, res) => {
     user: user,
   });
 
-  if (!expense) throw new ApiError(204, "Error creating expense");
+  if (!expense) throw new ApiError(404, "Error creating expense");
 
   return res
     .status(200)
@@ -53,6 +55,9 @@ const handleEditExpense = asyncHandler(async (req, res) => {
 
   const { userId } = req.user;
 
+  if (!mongoose.Types.ObjectId.isValid(expenseId))
+    throw new ApiError(400, "Invalid expense ID");
+
   const expense = await Expense.findOne({
     _id: expenseId,
     user: userId,
@@ -61,9 +66,6 @@ const handleEditExpense = asyncHandler(async (req, res) => {
   if (!expense) {
     throw new ApiError(404, "Expense not found");
   }
-
-  if (!mongoose.Types.ObjectId.isValid(expenseId))
-    throw new ApiError(400, "Invalid expense ID");
 
   const updates = {};
 
@@ -80,17 +82,18 @@ const handleEditExpense = asyncHandler(async (req, res) => {
     }
     updates.amount = amount;
   }
-
   let categoryId;
-  if (category.trim().toLowerCase()) {
-    const searchCategory = await Category.findOne({
-      name: category.trim().toLowerCase(),
-    });
+  if (category && category.trim()) {
+    if (category.trim().toLowerCase()) {
+      const searchCategory = await Category.findOne({
+        name: category.trim().toLowerCase(),
+      });
 
-    if (searchCategory) {
-      categoryId = searchCategory._id;
-    } else {
-      throw new ApiError(404, "Category not found");
+      if (searchCategory) {
+        categoryId = searchCategory._id;
+      } else {
+        throw new ApiError(404, "Category not found");
+      }
     }
   }
 
@@ -130,7 +133,7 @@ const handleEditExpense = asyncHandler(async (req, res) => {
     { new: true },
   );
 
-  if (!expense) throw new ApiError(404, "Error updating expense");
+  if (!updatedExpense) throw new ApiError(404, "Error updating expense");
 
   return res
     .status(200)
