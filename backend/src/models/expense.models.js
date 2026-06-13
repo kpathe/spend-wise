@@ -38,4 +38,4 @@ const expenseSchema = new Schema(
   { timestamps: true },
 );
 
-export const Expense = model("expense", expenseSchema);
+export const Expense = model("Expense", expenseSchema);
