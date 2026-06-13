@@ -9,12 +9,6 @@ const categorySchema = new Schema(
       trim: true,
       unique: true,
     },
-
-    createdBy: {
-      type: Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
-    },
     transactionType: {
       type: String,
       enum: ["credit", "debit"],
