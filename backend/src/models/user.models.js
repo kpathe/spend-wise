@@ -43,4 +43,4 @@ userSchema.methods.isPasswordCorrect = async function (password) {
   return await bcrypt.compare(password, this.password);
 };
 
-export const User = model("user", userSchema);
+export const User = model("User", userSchema);
