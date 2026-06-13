@@ -860,7 +860,10 @@ const handleGetExpenseSummary = asyncHandler(async (req, res) => {
     },
   ]);
 
-  let resultObj = { ...expensesSummary[0] };
+  let resultObj = {
+    ...expensesSummary[0],
+    balance: expensesSummary[0].creditSum - expensesSummary[0].debitSum,
+  };
 
   if (expensesSummary.length == 0) {
     resultObj.transactionsCount = 0;
@@ -868,6 +871,7 @@ const handleGetExpenseSummary = asyncHandler(async (req, res) => {
     resultObj.creditCount = 0;
     resultObj.debitSum = 0;
     resultObj.creditSum = 0;
+    resultObj.balance = 0;
   }
 
   return res
@@ -877,7 +881,7 @@ const handleGetExpenseSummary = asyncHandler(async (req, res) => {
     );
 });
 
-const handleGetCategoryBreakdown = asyncHandler();
+const handleGetCategoryBreakdown = asyncHandler(async (req, res) => {});
 
 export {
   handleCreateExpense,
