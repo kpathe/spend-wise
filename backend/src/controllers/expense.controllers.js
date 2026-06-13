@@ -4,7 +4,7 @@ import { Category } from "../models/category.models.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiResponse } from "../utils/apiResponse.js";
 import { ApiError } from "../utils/apiError.js";
-import mongoose from "mongoose";
+import mongoose, { mongo } from "mongoose";
 
 // create expense
 const handleCreateExpense = asyncHandler(async (req, res) => {
@@ -492,11 +492,389 @@ const handleGetExpenseSummary = asyncHandler(async (req, res) => {
     sort,
     page,
     limit,
-  } = req.query
+  } = req.query;
 
-return res
+  const filterObject = {};
+  const mongoQuery = {
+    user: req.user.userId,
+  };
+
+  const allowedPeriods = ["day", "week", "month", "year"];
+
+  if (period !== undefined && (from !== undefined || to !== undefined)) {
+    throw new ApiError(400, "Period cannot be used with from/to date filters");
+  }
+
+  if (period !== undefined) {
+    if (targetDate === undefined) {
+      throw new ApiError(400, "targetDate is required when period is provided");
+    }
+
+    let isValidTargetDate = false;
+
+    if (period === "day") {
+      isValidTargetDate = /^\d{4}-\d{2}-\d{2}$/.test(targetDate);
+    }
+
+    if (period === "month") {
+      isValidTargetDate = /^\d{4}-\d{2}$/.test(targetDate);
+    }
+
+    if (period === "year") {
+      isValidTargetDate = /^\d{4}$/.test(targetDate);
+    }
+
+    if (!isValidTargetDate) {
+      throw new ApiError(400, "Invalid targetDate for selected period");
+    }
+    filterObject.period = period;
+    filterObject.targetDate = targetDate;
+  }
+
+  if (from !== undefined) {
+    const fromDate = new Date(from);
+
+    if (isNaN(fromDate.getTime())) {
+      throw new ApiError(400, "Invalid from date");
+    }
+
+    filterObject.from = fromDate;
+  }
+
+  if (to !== undefined) {
+    const toDate = new Date(to);
+
+    if (isNaN(toDate.getTime())) {
+      throw new ApiError(400, "Invalid to date");
+    }
+
+    filterObject.to = toDate;
+  }
+
+  // date range validation
+  if (
+    filterObject.from &&
+    filterObject.to &&
+    filterObject.from > filterObject.to
+  ) {
+    throw new ApiError(400, "'from' date cannot be later than 'to' date");
+  }
+
+  const allowedTypes = ["credit", "debit"];
+
+  if (type !== undefined) {
+    if (!allowedTypes.includes(type)) {
+      throw new ApiError(400, "Invalid type");
+    }
+
+    filterObject.type = type;
+  }
+
+  // category validation
+  if (categoryId !== undefined) {
+    if (!mongoose.Types.ObjectId.isValid(categoryId)) {
+      throw new ApiError(400, "Invalid category id");
+    }
+
+    const categoryExists = await Category.exists({
+      _id: categoryId,
+    });
+
+    if (!categoryExists) {
+      throw new ApiError(404, "Category not found");
+    }
+
+    filterObject.categoryId = categoryId;
+  }
+
+  // search validation
+  if (search !== undefined) {
+    const trimmedSearch = search.trim();
+
+    if (trimmedSearch.length === 0) {
+      throw new ApiError(400, "Search query cannot be empty");
+    }
+
+    filterObject.search = trimmedSearch;
+  }
+
+  // minAmount maxAmount validation
+  if (minAmount !== undefined) {
+    if (minAmount.trim() === "") {
+      throw new ApiError(400, "minAmount cannot be empty");
+    }
+
+    const min = Number(minAmount);
+
+    if (!/^\d+(\.\d+)?$/.test(min)) {
+      throw new ApiError(400, "Invalid minAmount");
+    }
+
+    if (min < 0) {
+      throw new ApiError(400, "minAmount cannot be negative");
+    }
+
+    filterObject.minAmount = min;
+  }
+
+  if (maxAmount !== undefined) {
+    if (maxAmount.trim() === "") {
+      throw new ApiError(400, "maxAmount cannot be empty");
+    }
+
+    const max = Number(maxAmount);
+
+    if (!/^\d+(\.\d+)?$/.test(max)) {
+      throw new ApiError(400, "Invalid maxAmount");
+    }
+
+    if (max < 0) {
+      throw new ApiError(400, "maxAmount cannot be negative");
+    }
+
+    filterObject.maxAmount = max;
+  }
+
+  if (
+    filterObject.minAmount !== undefined &&
+    filterObject.maxAmount !== undefined &&
+    filterObject.minAmount > filterObject.maxAmount
+  ) {
+    throw new ApiError(400, "minAmount cannot be greater than maxAmount");
+  }
+
+  // sort validation
+  const allowedSorts = ["date_desc", "date_asc", "amount_desc", "amount_asc"];
+
+  if (sort !== undefined) {
+    if (!allowedSorts.includes(sort)) {
+      throw new ApiError(400, "Invalid sort option");
+    }
+
+    filterObject.sort = sort;
+  } else {
+    filterObject.sort = "date_desc";
+  }
+
+  // page validation
+  if (page !== undefined) {
+    const trimmedPage = page.trim();
+
+    if (trimmedPage === "") {
+      throw new ApiError(400, "Page cannot be empty");
+    }
+
+    if (!/^\d+$/.test(trimmedPage)) {
+      throw new ApiError(400, "Invalid page");
+    }
+
+    const pageNumber = Number(trimmedPage);
+
+    if (pageNumber < 1) {
+      throw new ApiError(400, "Page must be greater than 0");
+    }
+
+    filterObject.page = pageNumber;
+  } else {
+    filterObject.page = 1;
+  }
+
+  // limit validation
+  if (limit !== undefined) {
+    const trimmedLimit = limit.trim();
+
+    if (trimmedLimit.length === 0) {
+      throw new ApiError(400, "Limit cannot be empty");
+    }
+
+    if (!/^\d+$/.test(trimmedLimit)) {
+      throw new ApiError(400, "Invalid limit");
+    }
+
+    const limitNumber = Number(trimmedLimit);
+
+    if (trimmedLimit.length === 0) {
+      throw new ApiError(400, "Limit cannot be empty");
+    }
+
+    if (!/^\d+$/.test(trimmedLimit)) {
+      throw new ApiError(400, "Invalid limit");
+    }
+
+    filterObject.limit = limitNumber;
+  } else {
+    filterObject.limit = 20;
+  }
+
+  if (filterObject.type) {
+    mongoQuery.transactionType = filterObject.type;
+  }
+
+  if (filterObject.categoryId) {
+    mongoQuery.category = filterObject.categoryId;
+  }
+
+  if (
+    filterObject.minAmount !== undefined ||
+    filterObject.maxAmount !== undefined
+  ) {
+    mongoQuery.amount = {};
+
+    if (filterObject.minAmount !== undefined) {
+      mongoQuery.amount.$gte = filterObject.minAmount;
+    }
+
+    if (filterObject.maxAmount !== undefined) {
+      mongoQuery.amount.$lte = filterObject.maxAmount;
+    }
+  }
+
+  if (filterObject.search) {
+    mongoQuery.$or = [
+      {
+        name: {
+          $regex: filterObject.search,
+          $options: "i",
+        },
+      },
+      {
+        note: {
+          $regex: filterObject.search,
+          $options: "i",
+        },
+      },
+    ];
+  }
+
+  if (filterObject.from || filterObject.to) {
+    mongoQuery.date = {};
+
+    if (filterObject.from) {
+      mongoQuery.date.$gte = filterObject.from;
+    }
+
+    if (filterObject.to) {
+      mongoQuery.date.$lte = filterObject.to;
+    }
+  }
+
+  if (filterObject.period === "day") {
+    const start = new Date(filterObject.targetDate);
+    const end = new Date(start);
+    end.setDate(end.getDate() + 1);
+
+    mongoQuery.date = {
+      $gte: start,
+      $lt: end,
+    };
+  }
+
+  if (filterObject.period === "month") {
+    const [year, month] = filterObject.targetDate.split("-");
+
+    const start = new Date(year, month - 1, 1);
+    const end = new Date(year, month, 1);
+
+    mongoQuery.date = {
+      $gte: start,
+      $lt: end,
+    };
+  }
+
+  if (filterObject.period === "year") {
+    const year = Number(filterObject.targetDate);
+
+    const start = new Date(year, 0, 1);
+
+    const end = new Date(year + 1, 0, 1);
+
+    mongoQuery.date = {
+      $gte: start,
+      $lt: end,
+    };
+  }
+
+  mongoQuery.user = new mongoose.Types.ObjectId(mongoQuery.user);
+
+  const expensesSummary = await Expense.aggregate([
+    { $match: mongoQuery },
+    {
+      $group: {
+        _id: null,
+        transactionsCount: { $sum: 1 },
+        debitSum: {
+          $sum: {
+            $cond: [
+              {
+                $eq: ["$transactionType", "debit"],
+              },
+              "$amount",
+              0,
+            ],
+          },
+        },
+        creditSum: {
+          $sum: {
+            $cond: [
+              {
+                $eq: ["$transactionType", "credit"],
+              },
+              "$amount",
+              0,
+            ],
+          },
+        },
+        debitCount: {
+          $sum: {
+            $cond: [
+              {
+                $eq: ["$transactionType", "debit"],
+              },
+              1,
+              0,
+            ],
+          },
+        },
+        creditCount: {
+          $sum: {
+            $cond: [
+              {
+                $eq: ["$transactionType", "credit"],
+              },
+              1,
+              0,
+            ],
+          },
+        },
+      },
+    },
+    {
+      $project: {
+        transactionsCount: 1,
+        debitSum: 1,
+        creditSum: 1,
+        debitCount: 1,
+        creditCount: 1,
+        _id: 0,
+      },
+    },
+  ]);
+
+  let resultObj = { ...expensesSummary[0] };
+
+  if (expensesSummary.length == 0) {
+    resultObj.transactionsCount = 0;
+    resultObj.debitCount = 0;
+    resultObj.creditCount = 0;
+    resultObj.debitSum = 0;
+    resultObj.creditSum = 0;
+  }
+
+  return res
     .status(200)
-    .json(new ApiResponse(200, expensesSummary, "Expenses summary successfully!"));
+    .json(
+      new ApiResponse(200, resultObj, "Expenses summary fetched successfully!"),
+    );
 });
 
 const handleGetCategoryBreakdown = asyncHandler();
