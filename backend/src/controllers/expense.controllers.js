@@ -909,12 +909,20 @@ const handleGetExpenseSummary = asyncHandler(async (req, res) => {
 
 const handleGetCategoryBreakdown = asyncHandler(async (req, res) => {
   const { categoryId } = req.query;
+
+  const matchStage = {
+    user: new mongoose.Types.ObjectId(req.user.userId),
+  };
+
+  if (mongoose.Types.ObjectId.isValid(categoryId)) {
+    matchStage.category = new mongoose.Types.ObjectId(categoryId);
+  } else {
+    throw new ApiError(400, "Invalid categoryId");
+  }
+
   const breakdown = await Expense.aggregate([
     {
-      $match: {
-        user: new mongoose.Types.ObjectId(req.user.userId),
-        category: categoryId,
-      },
+      $match: matchStage,
     },
 
     {
@@ -1005,12 +1013,14 @@ const handleGetCategoryBreakdown = asyncHandler(async (req, res) => {
     },
   ]);
 
+  console.log(breakdown);
+
   return res
     .status(200)
     .json(
       new ApiResponse(
         200,
-        breakdown,
+        breakdown[0],
         "Category breakdown fetched successfully",
       ),
     );
