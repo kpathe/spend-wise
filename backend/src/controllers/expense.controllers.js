@@ -16,11 +16,24 @@ const handleCreateExpense = asyncHandler(async (req, res) => {
 
   const user = await User.findById(req.user.userId);
 
+  let categoryId;
+  if (category.trim().toLowerCase()) {
+    const searchCategory = await Category.findOne({
+      name: category.trim().toLowerCase(),
+    });
+
+    if (searchCategory) {
+      categoryId = searchCategory._id;
+    } else {
+      throw new ApiError(404, "Category not found");
+    }
+  }
+
   const expense = await Expense.create({
     name: name,
     amount: amount,
     transactionType: type,
-    category: category,
+    category: categoryId,
     date: date || Date.now(),
     note: note,
     user: user,
@@ -68,8 +81,21 @@ const handleEditExpense = asyncHandler(async (req, res) => {
     updates.amount = amount;
   }
 
+  let categoryId;
+  if (category.trim().toLowerCase()) {
+    const searchCategory = await Category.findOne({
+      name: category.trim().toLowerCase(),
+    });
+
+    if (searchCategory) {
+      categoryId = searchCategory._id;
+    } else {
+      throw new ApiError(404, "Category not found");
+    }
+  }
+
   if (category !== undefined) {
-    updates.category = category;
+    updates.category = categoryId;
   }
 
   if (type !== undefined) {
