@@ -10,8 +10,13 @@ import mongoose, { mongo } from "mongoose";
 const handleCreateExpense = asyncHandler(async (req, res) => {
   const { name, amount, type, category, date, note } = req.body;
 
-  if (!name || !amount || !type || !date) {
+  if (!name || amount === undefined || !type || !date) {
     throw new ApiError(400, "All fields are required");
+  }
+
+  const parsedAmount = Number(amount);
+  if (isNaN(parsedAmount) || parsedAmount <= 0) {
+    throw new ApiError(400, "Amount must be a number greater than 0");
   }
 
   const user = await User.findById(req.user.userId);
@@ -33,7 +38,7 @@ const handleCreateExpense = asyncHandler(async (req, res) => {
 
   const expense = await Expense.create({
     name: name,
-    amount: amount,
+    amount: parsedAmount,
     transactionType: type,
     category: categoryId,
     date: date || Date.now(),
@@ -41,11 +46,11 @@ const handleCreateExpense = asyncHandler(async (req, res) => {
     user: user,
   });
 
-  if (!expense) throw new ApiError(404, "Error creating expense");
+  if (!expense) throw new ApiError(500, "Error creating expense");
 
   return res
-    .status(200)
-    .json(new ApiResponse(200, { expense }, "Expense created successfully!"));
+    .status(201)
+    .json(new ApiResponse(201, { expense }, "Expense created successfully!"));
 });
 
 const handleEditExpense = asyncHandler(async (req, res) => {
@@ -77,10 +82,11 @@ const handleEditExpense = asyncHandler(async (req, res) => {
   }
 
   if (amount !== undefined) {
-    if (amount <= 0) {
-      throw new ApiError(400, "Amount must be greater than 0");
+    const parsedUpdAmount = Number(amount);
+    if (isNaN(parsedUpdAmount) || parsedUpdAmount <= 0) {
+      throw new ApiError(400, "Amount must be a number greater than 0");
     }
-    updates.amount = amount;
+    updates.amount = parsedUpdAmount;
   }
   let categoryId;
   if (category && category.trim()) {
@@ -1019,8 +1025,6 @@ const handleGetCategoryBreakdown = asyncHandler(async (req, res) => {
       },
     },
   ]);
-
-  console.log(breakdown);
 
   return res
     .status(200)
