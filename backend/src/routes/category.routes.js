@@ -9,7 +9,7 @@ import { Router } from "express";
 const categoryRouter = Router();
 
 categoryRouter.get("/:categoryId", handleGetCategory);
-categoryRouter.get("/", handleGetCategories);
-categoryRouter.post("/", handleCreateCategory);
+categoryRouter.get("/", verifyJWT, handleGetCategories);
+categoryRouter.post("/", verifyJWT, handleCreateCategory);
 
 export default categoryRouter;
