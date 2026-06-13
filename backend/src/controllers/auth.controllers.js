@@ -9,14 +9,13 @@ const handleUserSignup = asyncHandler(async (req, res) => {
   const { name, username, email, password } = req.body;
 
   if (!name || !username || !email || !password) {
-    console.log(name, username, email, password);
     throw new ApiError(400, "All fields are required");
   }
 
   const existingUser = await User.findOne({
     email: email.trim().toLowerCase(),
   });
-  console.log(existingUser);
+
   if (existingUser) {
     throw new ApiError(400, "User already exists.");
   }
