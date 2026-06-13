@@ -886,10 +886,14 @@ const handleGetExpenseSummary = asyncHandler(async (req, res) => {
     },
   ]);
 
-  let resultObj = {
-    ...expensesSummary[0],
-    balance: expensesSummary[0].creditSum - expensesSummary[0].debitSum,
-  };
+  let resultObj = {};
+
+  if (expensesSummary.length !== 0) {
+    resultObj = {
+      ...expensesSummary[0],
+      balance: expensesSummary[0].creditSum - expensesSummary[0].debitSum,
+    };
+  }
 
   if (expensesSummary.length == 0) {
     resultObj.transactionsCount = 0;
