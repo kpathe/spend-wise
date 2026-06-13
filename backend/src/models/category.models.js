@@ -6,7 +6,8 @@ const categorySchema = new Schema(
       type: String,
       required: true,
       lowercase: true,
-      trim : true,
+      trim: true,
+      unique: true,
     },
 
     createdBy: {
@@ -14,13 +15,15 @@ const categorySchema = new Schema(
       ref: "User",
       required: true,
     },
+    transactionType: {
+      type: String,
+      enum: ["credit", "debit"],
+      required: true,
+    },
   },
   { timestamps: true },
 );
 
-categorySchema.index(
-  { name: 1, createdBy: 1 },
-  { unique: true }
-);
+categorySchema.index({ name: 1, createdBy: 1 }, { unique: true });
 
 export const Category = model("Category", categorySchema);
