@@ -7,11 +7,6 @@ import Login from "../src/pages/auth/Login.jsx";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<App />} />
-        <Route path="login" element={<Login />} />
-      </Routes>
-    </BrowserRouter>
+    <App />
   </StrictMode>,
 );
