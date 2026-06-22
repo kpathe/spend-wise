@@ -50,12 +50,29 @@ function DailyExpenses() {
           id="amount"
         />
 
-        <label htmlFor="type">Type : </label>
-        <input onChange={handleChange} type="radio" name="type" id="type" />
+        <input
+          onChange={handleChange}
+          type="radio"
+          id="debit"
+          name="type"
+          value="debit"
+        />
+        <label htmlFor="debit">Debit</label>
+
+        <input
+          onChange={handleChange}
+          type="radio"
+          id="credit"
+          name="type"
+          value="credit"
+        />
+        <label htmlFor="credit">Credit</label>
+
+        <p>Selected Type: {formData.type}</p>
 
         <label htmlFor="category">Category : </label>
         <select onChange={handleChange} name="category" id="category">
-          <option value=""></option>
+          <option value="food">Food</option>
         </select>
 
         <label htmlFor="date">Date : </label>

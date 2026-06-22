@@ -43,7 +43,7 @@ const handleCreateExpense = asyncHandler(async (req, res) => {
     category: categoryId,
     date: date || Date.now(),
     note: note,
-    user: user,
+    user: user._id,
   });
 
   if (!expense) throw new ApiError(500, "Error creating expense");
