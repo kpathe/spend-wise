@@ -920,10 +920,30 @@ const handleGetExpenseSummary = asyncHandler(async (req, res) => {
     );
 });
 
+const handleGetExpense = asyncHandler(async (req, res) => {
+  const { expenseId } = req.params;
+  const { userId } = req.user;
+
+  if (!mongoose.Types.ObjectId.isValid(expenseId))
+    throw new ApiError(400, "Invalid expense id");
+
+  const expense = await Expense.findOne({
+    _id: expenseId,
+    user: userId,
+  });
+
+  if (!expense) throw new ApiError(404, "Expense not found!");
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, expense, "Expense fetched successfully"));
+});
+
 export {
   handleCreateExpense,
   handleEditExpense,
   handleDeleteExpense,
   handleGetExpenseSummary,
   handleGetExpenses,
+  handleGetExpense,
 };
