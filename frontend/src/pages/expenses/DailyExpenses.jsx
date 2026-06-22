@@ -1,15 +1,38 @@
-import { useState } from "react";
-import { createExpense } from "../../api/expense.api";
+import { useEffect, useState } from "react";
+import { createExpense, getExpenses } from "../../api/expense.api";
 
 function DailyExpenses() {
   const [formData, setFormData] = useState({
     name: "",
     amount: "",
-    type: "",
+    type: "debit",
     category: "",
     date: "",
     note: "",
   });
+
+  const [expenses, setExpenses] = useState([]);
+
+  // fetch expenses
+
+  const filter = {
+    period: "day",
+    targetDate: "2026-06-22",
+  };
+
+  useEffect(() => {
+    const fetchExpenses = async () => {
+      try {
+        const response = await getExpenses(filter);
+        console.log(response.data);
+        setExpenses(response.data);
+      } catch (error) {
+        console.error("Failed to fetch expenses:", error);
+      }
+    };
+
+    fetchExpenses();
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -22,14 +45,23 @@ function DailyExpenses() {
 
     console.log(formData);
 
+    console.log("submit clicked");
+
     try {
       const data = await createExpense(formData);
+      setFormData({
+        name: "",
+        amount: "",
+        type: "debit",
+        category: "",
+        date: "",
+        note: "",
+      });
+
       console.log("Backend response", data);
     } catch (error) {
-      const errorMessage =
-        error.response?.data?.message || "Something went wrong";
-
-      alert(errorMessage);
+      console.log("request failed");
+      console.error(error);
     }
   };
   return (
@@ -40,10 +72,17 @@ function DailyExpenses() {
 
       <form onSubmit={handleSubmit}>
         <label htmlFor="">Name : </label>
-        <input onChange={handleChange} type="text" name="name" id="name" />
+        <input
+          value={formData.name}
+          onChange={handleChange}
+          type="text"
+          name="name"
+          id="name"
+        />
 
         <label htmlFor="amount">Amount : </label>
         <input
+          value={formData.amount}
           onChange={handleChange}
           type="number"
           name="amount"
@@ -72,17 +111,39 @@ function DailyExpenses() {
 
         <label htmlFor="category">Category : </label>
         <select onChange={handleChange} name="category" id="category">
+          <option value="">Select Category</option>
           <option value="food">Food</option>
+          <option value="music">Music</option>
         </select>
+        <p>Category : {formData.category || "not selected"}</p>
 
         <label htmlFor="date">Date : </label>
-        <input onChange={handleChange} type="date" name="date" id="date" />
+        <input
+          value={formData.date}
+          onChange={handleChange}
+          type="date"
+          name="date"
+          id="date"
+        />
 
         <label htmlFor="note">Note : </label>
-        <input onChange={handleChange} type="text" name="note" id="note" />
+        <input
+          value={formData.note}
+          onChange={handleChange}
+          type="text"
+          name="note"
+          id="note"
+        />
 
         <button type="submit">Add</button>
       </form>
+
+      {expenses.map((item) => (
+        <div key={item.id}>
+          {item.name} {item.amount} {item.type} {item.category?.name || "n/a"}{" "}
+          {item.transactionType}
+        </div>
+      ))}
     </div>
   );
 }

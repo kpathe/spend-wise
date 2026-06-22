@@ -1,7 +1,9 @@
 import apiClient from "../services/axios";
 
 export const createExpense = async (formData) => {
+  const start = performance.now();
   const response = await apiClient.post("/expenses", formData);
+  console.log("Total time:", performance.now() - start);
   return response.data;
 };
 
@@ -23,10 +25,9 @@ export const deleteExpense = async (expenseId) => {
 };
 
 export const getExpenses = async (filterObject) => {
-  const response = await apiClient.get("/expenses", {
+  const response = await apiClient.get("/expenses/", {
     params: filterObject,
   });
-
   return response.data;
 };
 
