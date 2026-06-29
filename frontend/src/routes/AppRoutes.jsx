@@ -9,7 +9,6 @@ import Signup from "../pages/auth/Signup";
 import Dashboard from "../pages/dashboard/Dashboard";
 import AllExpenses from "../pages/expenses/AllExpenses";
 import DailyExpenses from "../pages/expenses/DailyExpenses";
-import WeeklyExpenses from "../pages/expenses/WeeklyExpenses";
 import MonthlyExpenses from "../pages/expenses/MonthlyExpenses";
 import YearlyExpenses from "../pages/expenses/YearlyExpenses";
 import Categories from "../pages/categories/Categories";
@@ -37,7 +36,6 @@ const router = createBrowserRouter([
       { path: "/dashboard", element: <Dashboard /> },
       { path: "/expenses/daily-expenses", element: <DailyExpenses /> },
       { path: "/expenses/all-expenses", element: <AllExpenses /> },
-      { path: "/expenses/weekly-expenses", element: <WeeklyExpenses /> },
       { path: "/expenses/monthly-expenses", element: <MonthlyExpenses /> },
       { path: "/expenses/yearly-expenses", element: <YearlyExpenses /> },
       { path: "/categories/", element: <Categories /> },
