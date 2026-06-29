@@ -534,7 +534,7 @@ const handleGetExpenseSummary = asyncHandler(async (req, res) => {
     user: req.user.userId,
   };
 
-  const allowedPeriods = ["day", "week", "month", "year"];
+  const allowedPeriods = ["day", "month", "year"];
 
   if (period !== undefined && (from !== undefined || to !== undefined)) {
     throw new ApiError(400, "Period cannot be used with from/to date filters");
