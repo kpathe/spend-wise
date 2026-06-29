@@ -1,149 +1,101 @@
 import { useEffect, useState } from "react";
-import { createExpense, getExpenses } from "../../api/expense.api";
+import { getExpenses, getExpenseSummary } from "../../api/expense.api";
+import AddExpenseModal from "../../components/AddExpenseModal";
 
 function DailyExpenses() {
-  const [formData, setFormData] = useState({
-    name: "",
-    amount: "",
-    type: "debit",
-    category: "",
-    date: "",
-    note: "",
-  });
-
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [expenses, setExpenses] = useState([]);
+  const [expenseSummary, setExpenseSummary] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // fetch expenses
+  const today = new Date();
+
+  const todayStr = today.toISOString().split("T")[0];
+
+  const handlePrevious = () => {
+    const date = new Date(tdate);
+    date.setDate(date.getDate() - 1);
+    setTdate(date.toISOString().split("T")[0]);
+  };
+
+  const handleNext = () => {
+    const date = new Date(tdate);
+    date.setDate(date.getDate() + 1);
+    setTdate(date.toISOString().split("T")[0]);
+  };
+
+  const [tdate, setTdate] = useState(todayStr);
 
   const filter = {
     period: "day",
-    targetDate: "2026-06-22",
+    targetDate: tdate,
+  };
+
+  const loadExpenseData = async () => {
+    setLoading(true);
+    try {
+      const response = await getExpenses(filter);
+      setExpenses(response.data);
+      const summary = await getExpenseSummary(filter);
+      setExpenseSummary(summary.data);
+    } catch (error) {
+      console.error("Failed loading data", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
-    const fetchExpenses = async () => {
-      try {
-        const response = await getExpenses(filter);
-        console.log(response.data);
-        setExpenses(response.data);
-      } catch (error) {
-        console.error("Failed to fetch expenses:", error);
-      }
-    };
+    loadExpenseData();
+  }, [tdate]);
 
-    fetchExpenses();
-  }, []);
+  console.log(expenseSummary);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-
-    setFormData({ ...formData, [name]: value });
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    console.log(formData);
-
-    console.log("submit clicked");
-
-    try {
-      const data = await createExpense(formData);
-      setFormData({
-        name: "",
-        amount: "",
-        type: "debit",
-        category: "",
-        date: "",
-        note: "",
-      });
-
-      console.log("Backend response", data);
-    } catch (error) {
-      console.log("request failed");
-      console.error(error);
-    }
-  };
   return (
     <div>
       <h1>Daily Expenses Page</h1>
 
       <h2>Add Expense</h2>
 
-      <form onSubmit={handleSubmit}>
-        <label htmlFor="">Name : </label>
-        <input
-          value={formData.name}
-          onChange={handleChange}
-          type="text"
-          name="name"
-          id="name"
+      <div>{tdate}</div>
+
+      <button onClick={handlePrevious}>Previous</button>
+
+      <button style={{ margin: "14px" }} onClick={() => setIsModalOpen(true)}>
+        Add Expense
+      </button>
+
+      <button onClick={handleNext}>Next</button>
+
+      {isModalOpen && (
+        <AddExpenseModal
+          key={tdate}
+          onNewExpenseAdded={loadExpenseData}
+          onClose={() => setIsModalOpen(false)}
+          date={tdate}
         />
+      )}
 
-        <label htmlFor="amount">Amount : </label>
-        <input
-          value={formData.amount}
-          onChange={handleChange}
-          type="number"
-          name="amount"
-          id="amount"
-        />
+      {loading ? (
+        <div>Loading...</div>
+      ) : expenses.length === 0 ? (
+        <div>No expenses. Click Add to add one.</div>
+      ) : (
+        <>
+          {expenses.map((item) => (
+            <div key={item._id}>
+              {item.name} {item.amount} {item.type}{" "}
+              {item.category?.name || "n/a"} {item.transactionType}
+            </div>
+          ))}
 
-        <input
-          onChange={handleChange}
-          type="radio"
-          id="debit"
-          name="type"
-          value="debit"
-        />
-        <label htmlFor="debit">Debit</label>
-
-        <input
-          onChange={handleChange}
-          type="radio"
-          id="credit"
-          name="type"
-          value="credit"
-        />
-        <label htmlFor="credit">Credit</label>
-
-        <p>Selected Type: {formData.type}</p>
-
-        <label htmlFor="category">Category : </label>
-        <select onChange={handleChange} name="category" id="category">
-          <option value="">Select Category</option>
-          <option value="food">Food</option>
-          <option value="music">Music</option>
-        </select>
-        <p>Category : {formData.category || "not selected"}</p>
-
-        <label htmlFor="date">Date : </label>
-        <input
-          value={formData.date}
-          onChange={handleChange}
-          type="date"
-          name="date"
-          id="date"
-        />
-
-        <label htmlFor="note">Note : </label>
-        <input
-          value={formData.note}
-          onChange={handleChange}
-          type="text"
-          name="note"
-          id="note"
-        />
-
-        <button type="submit">Add</button>
-      </form>
-
-      {expenses.map((item) => (
-        <div key={item.id}>
-          {item.name} {item.amount} {item.type} {item.category?.name || "n/a"}{" "}
-          {item.transactionType}
-        </div>
-      ))}
+          <div>
+            <p>Debit: {expenseSummary.debitSum}</p>
+            <p>Credit: {expenseSummary.creditSum}</p>
+            <p>Savings: {expenseSummary.balance}</p>
+          </div>
+        </>
+      )}
     </div>
   );
 }
