@@ -187,6 +187,73 @@ function DailyExpenses() {
     return d.toLocaleDateString('en-US', options);
   };
 
+  const credits = expenses.filter(item => item.transactionType === "credit");
+  const debits = expenses.filter(item => item.transactionType === "debit");
+
+  const renderExpenseList = (itemsList) => {
+    return itemsList.map((item) => {
+      const isCredit = item.transactionType === "credit";
+      return (
+        <div
+          key={item._id}
+          className="group bg-white dark:bg-zinc-900 border border-slate-100 dark:border-zinc-800/80 p-3 rounded-2xl flex items-center justify-between hover:shadow-md hover:border-slate-200 dark:hover:border-zinc-700 transition-all duration-200"
+        >
+          <div className="flex items-center gap-3 min-w-0">
+            {getCategoryIcon(item.category?.name, item.transactionType)}
+            <div className="min-w-0">
+              <div className="text-sm font-bold text-slate-700 dark:text-zinc-200 truncate">
+                {item.name}
+              </div>
+              <div className="flex items-center gap-1.5 mt-0.5 text-xs text-slate-400 dark:text-zinc-500">
+                <span className="font-semibold capitalize text-indigo-500 dark:text-indigo-400/90">
+                  {item.category?.name || "Uncategorized"}
+                </span>
+                {item.note && (
+                  <>
+                    <span>•</span>
+                    <span className="truncate max-w-[120px]">{item.note}</span>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <div className="text-right">
+              <span className={`text-sm font-black font-sans ${
+                isCredit ? "text-emerald-600 dark:text-emerald-500" : "text-purple-600 dark:text-purple-500"
+              }`}>
+                {isCredit ? "+" : "-"}₹{item.amount}
+              </span>
+            </div>
+
+            {/* Hover action controls */}
+            <div className="flex items-center gap-1.5 border-l border-slate-100 dark:border-zinc-800 pl-2">
+              <button
+                onClick={() => handleEdit(item)}
+                className="p-1 rounded-lg text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-50 dark:hover:bg-zinc-800 transition-all cursor-pointer"
+                title="Edit transaction"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                </svg>
+              </button>
+              <button
+                onClick={() => handleDelete(item._id)}
+                className="p-1 rounded-lg text-slate-400 hover:text-rose-600 dark:hover:text-rose-500 hover:bg-slate-50 dark:hover:bg-zinc-800 transition-all cursor-pointer"
+                title="Delete transaction"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    });
+  };
+
   return (
     <div className="flex-1 flex flex-col p-4 relative overflow-hidden h-full">
       {/* Date Navigation Bar */}
@@ -276,74 +343,34 @@ function DailyExpenses() {
             </p>
           </div>
         ) : (
-          <div className="space-y-3">
-            <h3 className="text-xs font-bold text-slate-400 dark:text-zinc-500 uppercase tracking-wider px-1">
-              Transactions ({expenses.length})
-            </h3>
-            
-            <div className="space-y-2.5">
-              {expenses.map((item) => {
-                const isCredit = item.transactionType === "credit";
-                return (
-                  <div
-                    key={item._id}
-                    className="group bg-white dark:bg-zinc-900 border border-slate-100 dark:border-zinc-800/80 p-3 rounded-2xl flex items-center justify-between hover:shadow-md hover:border-slate-200 dark:hover:border-zinc-700 transition-all duration-200"
-                  >
-                    <div className="flex items-center gap-3 min-w-0">
-                      {getCategoryIcon(item.category?.name, item.transactionType)}
-                      <div className="min-w-0">
-                        <div className="text-sm font-bold text-slate-700 dark:text-zinc-200 truncate">
-                          {item.name}
-                        </div>
-                        <div className="flex items-center gap-1.5 mt-0.5 text-xs text-slate-400 dark:text-zinc-500">
-                          <span className="font-semibold capitalize text-indigo-500 dark:text-indigo-400/90">
-                            {item.category?.name || "Uncategorized"}
-                          </span>
-                          {item.note && (
-                            <>
-                              <span>•</span>
-                              <span className="truncate max-w-[120px]">{item.note}</span>
-                            </>
-                          )}
-                        </div>
-                      </div>
-                    </div>
+          <div className="space-y-6">
+            {credits.length > 0 && (
+              <div className="space-y-3">
+                <div className="flex items-center gap-2 px-1">
+                  <div className="w-2 h-2 rounded-full bg-emerald-500" />
+                  <h3 className="text-xs font-bold text-emerald-600 dark:text-emerald-500 uppercase tracking-wider">
+                    Credits ({credits.length})
+                  </h3>
+                </div>
+                <div className="space-y-2.5">
+                  {renderExpenseList(credits)}
+                </div>
+              </div>
+            )}
 
-                    <div className="flex items-center gap-3">
-                      <div className="text-right">
-                        <span className={`text-sm font-black font-sans ${
-                          isCredit ? "text-emerald-600 dark:text-emerald-500" : "text-purple-600 dark:text-purple-500"
-                        }`}>
-                          {isCredit ? "+" : "-"}₹{item.amount}
-                        </span>
-                      </div>
-
-                      {/* Hover action controls */}
-                      <div className="flex items-center gap-1.5 border-l border-slate-100 dark:border-zinc-800 pl-2">
-                        <button
-                          onClick={() => handleEdit(item)}
-                          className="p-1 rounded-lg text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-50 dark:hover:bg-zinc-800 transition-all cursor-pointer"
-                          title="Edit transaction"
-                        >
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                          </svg>
-                        </button>
-                        <button
-                          onClick={() => handleDelete(item._id)}
-                          className="p-1 rounded-lg text-slate-400 hover:text-rose-600 dark:hover:text-rose-500 hover:bg-slate-50 dark:hover:bg-zinc-800 transition-all cursor-pointer"
-                          title="Delete transaction"
-                        >
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                          </svg>
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+            {debits.length > 0 && (
+              <div className="space-y-3">
+                <div className="flex items-center gap-2 px-1">
+                  <div className="w-2 h-2 rounded-full bg-purple-500" />
+                  <h3 className="text-xs font-bold text-purple-600 dark:text-purple-500 uppercase tracking-wider">
+                    Debits ({debits.length})
+                  </h3>
+                </div>
+                <div className="space-y-2.5">
+                  {renderExpenseList(debits)}
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>
@@ -351,7 +378,7 @@ function DailyExpenses() {
       {/* Floating Action Button (FAB) */}
       <button
         onClick={handleAddClick}
-        className="absolute bottom-6 right-6 w-14 h-14 rounded-full bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white flex items-center justify-center shadow-lg shadow-indigo-300 dark:shadow-none hover:shadow-indigo-400/40 hover:-translate-y-0.5 active:translate-y-0 active:scale-95 transition-all cursor-pointer z-30"
+        className="absolute bottom-6 left-1/2 -translate-x-1/2 w-14 h-14 rounded-full bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white flex items-center justify-center shadow-lg shadow-indigo-300 dark:shadow-none hover:shadow-indigo-400/40 hover:-translate-y-0.5 active:translate-y-0 active:scale-95 transition-all cursor-pointer z-30"
         title="Add transaction"
       >
         <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
