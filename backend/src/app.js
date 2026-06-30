@@ -10,7 +10,7 @@ const app = express();
 
 app.use(
   cors({
-    origin: "https://spendwise-bay-nine.vercel.app/",
+    origin: "https://spendwise-bay-nine.vercel.app",
     credentials: true,
   })
 );
