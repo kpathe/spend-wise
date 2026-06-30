@@ -1,1 +1,41 @@
 @import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+body {
+  margin: 0;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom scrollbar for mobile feel */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(156, 163, 175, 0.3);
+  border-radius: 4px;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: rgba(75, 85, 99, 0.5);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(156, 163, 175, 0.5);
+}
+
+/* Calming repeating finance doodles background in light mode */
+.bg-doodles {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' viewBox='0 0 180 180'%3E%3Cg fill='none' stroke='%238b5cf6' stroke-width='1.4' stroke-opacity='0.22' stroke-linecap='round' stroke-linejoin='round'%3E%3C!-- Wallet --%3E%3Cpath d='M20 30h20c1.1 0 2 .9 2 2v10c0 1.1-.9 2-2 2H20c-1.1 0-2-.9-2-2V32c0-1.1.9-2 2-2zM36 37h6v2h-6z'/%3E%3C!-- Coin stack --%3E%3Cellipse cx='140' cy='45' rx='8' ry='3'/%3E%3Cpath d='M132 45v5c0 1.6 3.6 3 8 3s8-1.4 8-3v-5M132 50v5c0 1.6 3.6 3 8 3s8-1.4 8-3v-5'/%3E%3C!-- Credit Card --%3E%3Crect x='25' y='110' width='24' height='16' rx='2'/%3E%3Cpath d='M25 115h24M28 121h3'/%3E%3C!-- Growth Chart --%3E%3Cpath d='M120 120h25M125 120v-12M133 120v-18M141 120v-24M125 108l8-6 8 10'/%3E%3C!-- Dollar Sign --%3E%3Cpath d='M85 70c0-2 1.5-3.5 4-3.5s4 1.5 4 3.5c0 3-8 2-8 5 0 2 1.5 3.5 4 3.5s4-1.5 4-3.5M89 64v15'/%3E%3C!-- Piggy bank --%3E%3Cpath d='M75 135c0-4.5 3.6-8 8-8s8 3.6 8 8c0 1.2-.3 2.5-.9 3.5l.9 2.5h-3.5l-.6-1.5c-1.2.4-2.5.6-3.9.6-4.4 0-8-3.6-8-8z'/%3E%3Ccircle cx='79' cy='133' r='0.6'/%3E%3C/g%3E%3C/svg%3E");
+}
+.dark .bg-doodles {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' viewBox='0 0 180 180'%3E%3Cg fill='none' stroke='%238b5cf6' stroke-width='1.4' stroke-opacity='0.22' stroke-linecap='round' stroke-linejoin='round'%3E%3C!-- Wallet --%3E%3Cpath d='M20 30h20c1.1 0 2 .9 2 2v10c0 1.1-.9 2-2 2H20c-1.1 0-2-.9-2-2V32c0-1.1.9-2 2-2zM36 37h6v2h-6z'/%3E%3C!-- Coin stack --%3E%3Cellipse cx='140' cy='45' rx='8' ry='3'/%3E%3Cpath d='M132 45v5c0 1.6 3.6 3 8 3s8-1.4 8-3v-5M132 50v5c0 1.6 3.6 3 8 3s8-1.4 8-3v-5'/%3E%3C!-- Credit Card --%3E%3Crect x='25' y='110' width='24' height='16' rx='2'/%3E%3Cpath d='M25 115h24M28 121h3'/%3E%3C!-- Growth Chart --%3E%3Cpath d='M120 120h25M125 120v-12M133 120v-18M141 120v-24M125 108l8-6 8 10'/%3E%3C!-- Dollar Sign --%3E%3Cpath d='M85 70c0-2 1.5-3.5 4-3.5s4 1.5 4 3.5c0 3-8 2-8 5 0 2 1.5 3.5 4 3.5s4-1.5 4-3.5M89 64v15'/%3E%3C!-- Piggy bank --%3E%3Cpath d='M75 135c0-4.5 3.6-8 8-8s8 3.6 8 8c0 1.2-.3 2.5-.9 3.5l.9 2.5h-3.5l-.6-1.5c-1.2.4-2.5.6-3.9.6-4.4 0-8-3.6-8-8z'/%3E%3Ccircle cx='79' cy='133' r='0.6'/%3E%3C/g%3E%3C/svg%3E");
+}
