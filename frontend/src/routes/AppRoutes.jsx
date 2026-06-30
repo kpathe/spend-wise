@@ -6,13 +6,14 @@ import {
 
 import Login from "../pages/auth/Login";
 import Signup from "../pages/auth/Signup";
-import Dashboard from "../pages/dashboard/Dashboard";
 import AllExpenses from "../pages/expenses/AllExpenses";
 import DailyExpenses from "../pages/expenses/DailyExpenses";
 import MonthlyExpenses from "../pages/expenses/MonthlyExpenses";
 import YearlyExpenses from "../pages/expenses/YearlyExpenses";
 import Categories from "../pages/categories/Categories";
 import CategoryBreakdown from "../pages/categories/CategoryBreakdown";
+import Settings from "../pages/settings/Settings";
+import Charts from "../pages/charts/Charts";
 import AuthLayout from "../layouts/AuthLayout";
 import MainLayout from "../layouts/MainLayout";
 
@@ -33,13 +34,16 @@ const router = createBrowserRouter([
   {
     element: <MainLayout />,
     children: [
-      { path: "/dashboard", element: <Dashboard /> },
+      { path: "/", element: <Navigate to="/expenses/daily-expenses" replace /> },
+      { path: "/dashboard", element: <Navigate to="/expenses/daily-expenses" replace /> },
       { path: "/expenses/daily-expenses", element: <DailyExpenses /> },
       { path: "/expenses/all-expenses", element: <AllExpenses /> },
       { path: "/expenses/monthly-expenses", element: <MonthlyExpenses /> },
       { path: "/expenses/yearly-expenses", element: <YearlyExpenses /> },
-      { path: "/categories/", element: <Categories /> },
+      { path: "/categories", element: <Categories /> },
       { path: "/categories/breakdown", element: <CategoryBreakdown /> },
+      { path: "/settings", element: <Settings /> },
+      { path: "/charts", element: <Charts /> },
     ],
   },
   {
