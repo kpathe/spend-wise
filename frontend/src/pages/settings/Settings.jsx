@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { changePassword } from "../../api/user.api";
 import { logoutUser } from "../../api/auth.api";
 import { createCategory } from "../../api/category.api";
+import { deleteCookie } from "../../utils/cookie";
 
 function Settings() {
   const navigate = useNavigate();
@@ -111,11 +112,13 @@ function Settings() {
   const handleLogout = async () => {
     try {
       await logoutUser();
-      localStorage.removeItem("userLoggedIn");
+      deleteCookie("userLoggedIn");
+      deleteCookie("spendwiseUserName");
       navigate("/auth/login");
     } catch (error) {
       console.error("Logout failed", error);
-      localStorage.removeItem("userLoggedIn");
+      deleteCookie("userLoggedIn");
+      deleteCookie("spendwiseUserName");
       navigate("/auth/login");
     }
   };

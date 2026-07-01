@@ -1,4 +1,5 @@
 import axios from "axios";
+import { deleteCookie } from "../utils/cookie";
 
 const baseURL = import.meta.env.VITE_API_BASE_URL;
 
@@ -14,8 +15,8 @@ apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response && error.response.status === 401) {
-      localStorage.removeItem("userLoggedIn");
-      localStorage.removeItem("spendwiseUserName");
+      deleteCookie("userLoggedIn");
+      deleteCookie("spendwiseUserName");
       // Avoid redirecting from auth pages to prevent loops
       if (!window.location.pathname.startsWith("/auth/")) {
         window.location.href = "/auth/login";

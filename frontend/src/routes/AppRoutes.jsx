@@ -18,13 +18,15 @@ import Charts from "../pages/charts/Charts";
 import AuthLayout from "../layouts/AuthLayout";
 import MainLayout from "../layouts/MainLayout";
 
+import { getCookie } from "../utils/cookie";
+
 const ProtectedRoute = () => {
-  const isAuthenticated = localStorage.getItem("userLoggedIn") === "true";
+  const isAuthenticated = getCookie("userLoggedIn") === "true";
   return isAuthenticated ? <Outlet /> : <Navigate to="/auth/login" replace />;
 };
 
 const PublicRoute = () => {
-  const isAuthenticated = localStorage.getItem("userLoggedIn") === "true";
+  const isAuthenticated = getCookie("userLoggedIn") === "true";
   return isAuthenticated ? <Navigate to="/expenses/daily-expenses" replace /> : <Outlet />;
 };
 

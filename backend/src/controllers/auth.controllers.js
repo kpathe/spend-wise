@@ -62,12 +62,27 @@ const handleUserLogin = asyncHandler(async (req, res) => {
     expiresIn: "7d",
   });
 
+  const origin = req.get("origin") || "";
+  const isSecure = origin.startsWith("https://");
+
   return res
     .status(200)
     .cookie("token", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "none",
+      secure: isSecure,
+      sameSite: isSecure ? "none" : "lax",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    })
+    .cookie("userLoggedIn", "true", {
+      httpOnly: false,
+      secure: isSecure,
+      sameSite: isSecure ? "none" : "lax",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    })
+    .cookie("spendwiseUserName", user.name, {
+      httpOnly: false,
+      secure: isSecure,
+      sameSite: isSecure ? "none" : "lax",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     })
     .json(
@@ -81,11 +96,24 @@ const handleUserLogin = asyncHandler(async (req, res) => {
 
 // logout controller
 const handleUserLogout = asyncHandler(async (req, res) => {
+  const origin = req.get("origin") || "";
+  const isSecure = origin.startsWith("https://");
+
   return res
     .clearCookie("token", {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "none",
+      secure: isSecure,
+      sameSite: isSecure ? "none" : "lax",
+    })
+    .clearCookie("userLoggedIn", {
+      httpOnly: false,
+      secure: isSecure,
+      sameSite: isSecure ? "none" : "lax",
+    })
+    .clearCookie("spendwiseUserName", {
+      httpOnly: false,
+      secure: isSecure,
+      sameSite: isSecure ? "none" : "lax",
     })
     .status(200)
     .json(new ApiResponse(200, null, "User logged  out"));

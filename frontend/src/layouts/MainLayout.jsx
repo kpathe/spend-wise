@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Outlet, NavLink, useLocation, useNavigate } from "react-router-dom";
+import { getCookie } from "../utils/cookie";
 
 function MainLayout() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -27,9 +28,9 @@ function MainLayout() {
     setTheme((prev) => (prev === "light" ? "dark" : "light"));
   };
 
-  // Get User initials from localStorage name
+  // Get User initials from cookie name
   const getUserInitials = () => {
-    const fullName = localStorage.getItem("spendwiseUserName") || "User";
+    const fullName = getCookie("spendwiseUserName") || "User";
     const parts = fullName.trim().split(/\s+/);
     if (parts.length >= 2) {
       return (parts[0][0] + parts[1][0]).toUpperCase();

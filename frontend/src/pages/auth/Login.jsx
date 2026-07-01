@@ -28,12 +28,6 @@ function Login() {
       const data = await loginUser(formData);
       console.log("Backend response", data);
       
-      // Save state to indicate logged in (can be used for basic UI checks)
-      localStorage.setItem("userLoggedIn", "true");
-      if (data && data.data && data.data.name) {
-        localStorage.setItem("spendwiseUserName", data.data.name);
-      }
-      
       navigate("/expenses/daily-expenses");
     } catch (error) {
       const errorMessage =
