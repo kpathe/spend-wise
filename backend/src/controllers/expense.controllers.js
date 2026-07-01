@@ -40,7 +40,7 @@ const handleCreateExpense = asyncHandler(async (req, res) => {
     name: name,
     amount: parsedAmount,
     transactionType: type,
-    category: categoryId,
+    category: categoryId || null,
     date: date || Date.now(),
     note: note,
     user: user._id,
@@ -121,12 +121,8 @@ const handleEditExpense = asyncHandler(async (req, res) => {
     updates.date = date;
   }
 
-  if (note !== undefined) {
-    if (!note.trim()) {
-      throw new ApiError(400, "Note cannot be empty");
-    }
-
-    updates.note = note;
+  if (note !== undefined && typeof note === "string" && note.trim() !== "") {
+    updates.note = note.trim();
   }
 
   if (Object.keys(updates).length === 0) {
