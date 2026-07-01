@@ -47,7 +47,7 @@ function Login() {
   return (
     <div className="w-full flex flex-col justify-between min-h-full">
       {/* Top logo area */}
-      <div className="flex flex-col items-center text-center mt-6">
+      <div className="flex flex-col items-center text-center mt-2">
         <div className="w-14 h-14 rounded-2xl bg-indigo-600 dark:bg-indigo-500 flex items-center justify-center text-white shadow-xl shadow-indigo-100 dark:shadow-none mb-4">
           <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
