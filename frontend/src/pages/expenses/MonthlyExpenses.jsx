@@ -291,7 +291,7 @@ function MonthlyExpenses() {
       {/* Floating Action Button (FAB) */}
       <button
         onClick={handleAddClick}
-        className="absolute bottom-6 left-1/2 -translate-x-1/2 w-14 h-14 rounded-full bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white flex items-center justify-center shadow-lg shadow-indigo-300 dark:shadow-none hover:shadow-indigo-400/40 hover:-translate-y-0.5 active:translate-y-0 active:scale-95 transition-all cursor-pointer z-30"
+        className="absolute bottom-6 right-6 w-14 h-14 rounded-full bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white flex items-center justify-center shadow-lg shadow-indigo-300 dark:shadow-none hover:shadow-indigo-400/40 hover:-translate-y-0.5 active:translate-y-0 active:scale-95 transition-all cursor-pointer z-30"
         title="Add transaction"
       >
         <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
