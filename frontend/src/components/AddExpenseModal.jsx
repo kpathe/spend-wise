@@ -27,7 +27,9 @@ function AddExpenseModal({ onNewExpenseAdded, onClose, date, editingExpense }) {
         amount: editingExpense.amount || "",
         type: editingExpense.transactionType || "debit",
         category: editingExpense.category?.name || "",
-        date: editingExpense.date ? new Date(editingExpense.date).toISOString().split("T")[0] : date,
+        date: editingExpense.date
+          ? new Date(editingExpense.date).toISOString().split("T")[0]
+          : date,
         note: editingExpense.note || "",
       });
     }
@@ -109,7 +111,10 @@ function AddExpenseModal({ onNewExpenseAdded, onClose, date, editingExpense }) {
       onClose();
     } catch (err) {
       console.error(err);
-      setErrorMsg(err.response?.data?.message || "Something went wrong saving the expense.");
+      setErrorMsg(
+        err.response?.data?.message ||
+          "Something went wrong saving the expense.",
+      );
     } finally {
       setSubmitting(false);
     }
@@ -117,7 +122,7 @@ function AddExpenseModal({ onNewExpenseAdded, onClose, date, editingExpense }) {
 
   // Filter categories by type
   const filteredCategories = allCategories.filter(
-    (cat) => cat.transactionType === formData.type
+    (cat) => cat.transactionType === formData.type,
   );
 
   return (
@@ -127,9 +132,11 @@ function AddExpenseModal({ onNewExpenseAdded, onClose, date, editingExpense }) {
 
       {/* Modal Container */}
       <div className="relative w-full max-w-md bg-white dark:bg-zinc-900 rounded-t-3xl sm:rounded-3xl shadow-2xl border-t sm:border border-slate-100 dark:border-zinc-800 p-6 flex flex-col z-10 animate-in slide-in-from-bottom duration-300">
-        
         {/* Drag handle for mobile feel */}
-        <div className="w-12 h-1 bg-slate-200 dark:bg-zinc-800 rounded-full mx-auto mb-5 sm:hidden" onClick={onClose} />
+        <div
+          className="w-12 h-1 bg-slate-200 dark:bg-zinc-800 rounded-full mx-auto mb-5 sm:hidden"
+          onClick={onClose}
+        />
 
         {/* Modal Header */}
         <div className="flex items-center justify-between mb-5">
@@ -140,8 +147,18 @@ function AddExpenseModal({ onNewExpenseAdded, onClose, date, editingExpense }) {
             onClick={onClose}
             className="p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-zinc-200 hover:bg-slate-50 dark:hover:bg-zinc-800 active:scale-95 transition-all cursor-pointer"
           >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l18 12" />
+            <svg
+              className="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M6 18L18 6M6 6l18 12"
+              />
             </svg>
           </button>
         </div>
@@ -153,7 +170,6 @@ function AddExpenseModal({ onNewExpenseAdded, onClose, date, editingExpense }) {
         )}
 
         <form onSubmit={handleFormSubmit} className="space-y-4">
-          
           {/* Credit / Debit Segmented Toggle Control */}
           <div className="flex p-1 bg-slate-100 dark:bg-zinc-800/80 rounded-xl relative">
             <button
@@ -236,17 +252,35 @@ function AddExpenseModal({ onNewExpenseAdded, onClose, date, editingExpense }) {
               name="category"
               value={formData.category}
               onChange={handleChange}
-              required
               className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-slate-800 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-sm font-medium capitalize"
             >
-              <option className="bg-white dark:bg-zinc-900 text-slate-800 dark:text-zinc-100" value="">Select Category</option>
+              <option
+                className="bg-white dark:bg-zinc-900 text-slate-800 dark:text-zinc-100"
+                value=""
+              >
+                Select Category
+              </option>
               {loadingCategories ? (
-                <option className="bg-white dark:bg-zinc-900 text-slate-800 dark:text-zinc-100" disabled>Loading categories...</option>
+                <option
+                  className="bg-white dark:bg-zinc-900 text-slate-800 dark:text-zinc-100"
+                  disabled
+                >
+                  Loading categories...
+                </option>
               ) : filteredCategories.length === 0 ? (
-                <option className="bg-white dark:bg-zinc-900 text-slate-800 dark:text-zinc-100" disabled>No categories available</option>
+                <option
+                  className="bg-white dark:bg-zinc-900 text-slate-800 dark:text-zinc-100"
+                  disabled
+                >
+                  No categories available
+                </option>
               ) : (
                 filteredCategories.map((cat) => (
-                  <option className="bg-white dark:bg-zinc-900 text-slate-800 dark:text-zinc-100" key={cat._id} value={cat.name}>
+                  <option
+                    className="bg-white dark:bg-zinc-900 text-slate-800 dark:text-zinc-100"
+                    key={cat._id}
+                    value={cat.name}
+                  >
                     {cat.name}
                   </option>
                 ))
@@ -283,8 +317,18 @@ function AddExpenseModal({ onNewExpenseAdded, onClose, date, editingExpense }) {
               <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
             ) : (
               <>
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7" />
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2.5"
+                    d="M5 13l4 4L19 7"
+                  />
                 </svg>
                 {isEditMode ? "Save Changes" : "Confirm Entry"}
               </>
