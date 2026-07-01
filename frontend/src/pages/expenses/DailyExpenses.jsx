@@ -255,7 +255,7 @@ function DailyExpenses() {
   };
 
   return (
-    <div className="flex-1 flex flex-col p-4 relative overflow-hidden h-full">
+    <div className="flex-1 flex flex-col p-4 relative overflow-hidden h-full min-h-0">
       {/* Date Navigation Bar */}
       <div className="flex items-center justify-between bg-white dark:bg-zinc-900 px-3 py-2 rounded-2xl border border-slate-100 dark:border-zinc-800 shadow-sm mb-4">
         <button
@@ -378,7 +378,7 @@ function DailyExpenses() {
       {/* Floating Action Button (FAB) */}
       <button
         onClick={handleAddClick}
-        className="absolute bottom-6 right-6 w-14 h-14 rounded-full bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white flex items-center justify-center shadow-lg shadow-indigo-300 dark:shadow-none hover:shadow-indigo-400/40 hover:-translate-y-0.5 active:translate-y-0 active:scale-95 transition-all cursor-pointer z-30"
+        className="absolute bottom-6 right-6 w-14 h-14 rounded-full bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white flex items-center justify-center shadow-lg shadow-indigo-300 dark:shadow-none hover:shadow-indigo-400/40 hover:-translate-y-0.5 active:translate-y-0 active:scale-95 transition-all cursor-pointer z-40"
         title="Add transaction"
       >
         <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">

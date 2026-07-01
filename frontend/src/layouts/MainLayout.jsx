@@ -208,7 +208,7 @@ function MainLayout() {
         )}
 
         {/* Main Content Area */}
-        <main className="flex-1 flex flex-col bg-[#f4f2f8] dark:bg-zinc-950 overflow-hidden bg-doodles">
+        <main className="flex-1 flex flex-col bg-[#f4f2f8] dark:bg-zinc-950 overflow-hidden bg-doodles min-h-0">
           <Outlet />
         </main>
       </div>
