@@ -61,7 +61,7 @@ function MainLayout() {
   return (
     <div className="min-h-screen bg-slate-100 dark:bg-zinc-950 flex justify-center transition-colors duration-200">
       {/* Mobile-only Viewport Wrapper */}
-      <div className="w-full max-w-md min-h-screen bg-[#f4f2f8] dark:bg-zinc-900 flex flex-col border-x border-slate-200 dark:border-zinc-800 shadow-2xl relative overflow-x-hidden bg-doodles">
+      <div className="w-full max-w-md h-screen bg-[#f4f2f8] dark:bg-zinc-900 flex flex-col border-x border-slate-200 dark:border-zinc-800 shadow-2xl relative overflow-hidden bg-doodles">
 
         {/* Header */}
         <header className="sticky top-0 z-40 bg-[#378c34] dark:bg-zinc-900 border-b border-[#2c7229] dark:border-zinc-800 px-4 py-3 flex items-center justify-between shadow-xs">
