@@ -18,16 +18,16 @@ import Charts from "../pages/charts/Charts";
 import AuthLayout from "../layouts/AuthLayout";
 import MainLayout from "../layouts/MainLayout";
 
-import { getCookie } from "../utils/cookie";
+import { isAuthenticated } from "../utils/cookie";
 
 const ProtectedRoute = () => {
-  const isAuthenticated = getCookie("userLoggedIn") === "true";
-  return isAuthenticated ? <Outlet /> : <Navigate to="/auth/login" replace />;
+  const authenticated = isAuthenticated();
+  return authenticated ? <Outlet /> : <Navigate to="/auth/login" replace />;
 };
 
 const PublicRoute = () => {
-  const isAuthenticated = getCookie("userLoggedIn") === "true";
-  return isAuthenticated ? <Navigate to="/expenses/daily-expenses" replace /> : <Outlet />;
+  const authenticated = isAuthenticated();
+  return authenticated ? <Navigate to="/expenses/daily-expenses" replace /> : <Outlet />;
 };
 
 const router = createBrowserRouter([

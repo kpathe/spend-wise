@@ -27,8 +27,7 @@ function Login() {
     try {
       const data = await loginUser(formData);
       console.log("Backend response", data);
-      
-      navigate("/expenses/daily-expenses");
+      navigate("/expenses/daily-expenses", { replace: true });
     } catch (error) {
       const errorMessage =
         error.response?.data?.message || "Invalid credentials. Please try again.";
