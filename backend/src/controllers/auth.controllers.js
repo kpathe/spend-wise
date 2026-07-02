@@ -180,4 +180,23 @@ const handleUserLogout = asyncHandler(async (req, res) => {
   return res.status(200).json(new ApiResponse(200, null, "User logged out"));
 });
 
-export { handleUserSignup, handleUserLogin, handleUserLogout, handleRefreshToken };
+// get current user
+const handleGetCurrentUser = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user.userId).select(
+    "-password -createdAt -updatedAt"
+  );
+
+  if (!user) {
+    throw new ApiError(401, "Unauthorized");
+  }
+
+  return res.status(200).json(
+    new ApiResponse(
+      200,
+      { user },
+      "Current user fetched successfully",
+    ),
+  );
+});
+
+export { handleUserSignup, handleUserLogin, handleUserLogout, handleRefreshToken, handleGetCurrentUser };
