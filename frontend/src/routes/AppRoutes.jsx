@@ -18,16 +18,20 @@ import Charts from "../pages/charts/Charts";
 import AuthLayout from "../layouts/AuthLayout";
 import MainLayout from "../layouts/MainLayout";
 
-import { isAuthenticated } from "../utils/cookie";
+import { useAuth } from "../hooks/useAuth";
 
 const ProtectedRoute = () => {
-  const authenticated = isAuthenticated();
-  return authenticated ? <Outlet /> : <Navigate to="/auth/login" replace />;
+  const { isAuthenticated, isLoading } = useAuth();
+
+  if (isLoading) return null;
+  return isAuthenticated ? <Outlet /> : <Navigate to="/auth/login" replace />;
 };
 
 const PublicRoute = () => {
-  const authenticated = isAuthenticated();
-  return authenticated ? <Navigate to="/expenses/daily-expenses" replace /> : <Outlet />;
+  const { isAuthenticated, isLoading } = useAuth();
+
+  if (isLoading) return null;
+  return isAuthenticated ? <Navigate to="/expenses/daily-expenses" replace /> : <Outlet />;
 };
 
 const router = createBrowserRouter([

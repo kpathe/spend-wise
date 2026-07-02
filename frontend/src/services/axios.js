@@ -1,5 +1,4 @@
 import axios from "axios";
-import { clearAuthState } from "../utils/cookie";
 
 const baseURL = import.meta.env.VITE_API_BASE_URL;
 
@@ -14,7 +13,7 @@ const apiClient = axios.create({
 let isRefreshing = false;
 let refreshPromise = null;
 
-const refreshSession = async () => {
+const refreshAccessToken = async () => {
   if (isRefreshing && refreshPromise) {
     return refreshPromise;
   }
@@ -23,10 +22,7 @@ const refreshSession = async () => {
   refreshPromise = apiClient
     .post("/auth/refresh")
     .then(() => true)
-    .catch(() => {
-      clearAuthState();
-      return false;
-    })
+    .catch(() => false)
     .finally(() => {
       isRefreshing = false;
       refreshPromise = null;
@@ -40,24 +36,23 @@ apiClient.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
+    // Handle 401 - Token expired or unauthorized
     if (
       error.response?.status === 401 &&
       originalRequest &&
       !originalRequest.__isRetry &&
       !originalRequest.url?.includes("/auth/refresh")
     ) {
-      const refreshed = await refreshSession();
+      const refreshed = await refreshAccessToken();
 
       if (refreshed) {
         originalRequest.__isRetry = true;
         return apiClient(originalRequest);
-      }
-    }
-
-    if (error.response?.status === 401) {
-      clearAuthState();
-      if (!window.location.pathname.startsWith("/auth/")) {
-        window.location.href = "/auth/login";
+      } else {
+        // Refresh failed - redirect to login will be handled by AuthContext via /auth/me failing
+        if (!window.location.pathname.startsWith("/auth/")) {
+          window.location.href = "/auth/login";
+        }
       }
     }
 
@@ -66,3 +61,4 @@ apiClient.interceptors.response.use(
 );
 
 export default apiClient;
+

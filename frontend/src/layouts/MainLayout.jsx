@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Outlet, NavLink, useLocation, useNavigate } from "react-router-dom";
-import { getCookie } from "../utils/cookie";
+import { useAuth } from "../hooks/useAuth";
 
 function MainLayout() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -8,6 +8,7 @@ function MainLayout() {
   const avatarRef = useRef(null);
   const location = useLocation();
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   // Theme State & Persistence in Navbar
   const [theme, setTheme] = useState(
@@ -28,9 +29,9 @@ function MainLayout() {
     setTheme((prev) => (prev === "light" ? "dark" : "light"));
   };
 
-  // Get User initials from cookie name
+  // Get User initials from auth context
   const getUserInitials = () => {
-    const fullName = getCookie("spendwiseUserName") || "User";
+    const fullName = user?.name || "User";
     const parts = fullName.trim().split(/\s+/);
     if (parts.length >= 2) {
       return (parts[0][0] + parts[1][0]).toUpperCase();

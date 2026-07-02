@@ -3,10 +3,11 @@ import { useNavigate } from "react-router-dom";
 import { changePassword } from "../../api/user.api";
 import { logoutUser } from "../../api/auth.api";
 import { createCategory } from "../../api/category.api";
-import { clearAuthState } from "../../utils/cookie";
+import { useAuth } from "../../hooks/useAuth";
 
 function Settings() {
   const navigate = useNavigate();
+  const { logout } = useAuth();
 
   // Collapsible Password Form State
   const [showPasswordForm, setShowPasswordForm] = useState(false);
@@ -112,11 +113,10 @@ function Settings() {
   const handleLogout = async () => {
     try {
       await logoutUser();
-      clearAuthState();
-      navigate("/auth/login");
     } catch (error) {
       console.error("Logout failed", error);
-      clearAuthState();
+    } finally {
+      logout();
       navigate("/auth/login");
     }
   };

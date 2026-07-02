@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { loginUser } from "../../api/auth.api";
+import { useAuth } from "../../hooks/useAuth";
 
 function Login() {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -25,8 +27,12 @@ function Login() {
     setErrorMsg("");
 
     try {
-      const data = await loginUser(formData);
-      console.log("Backend response", data);
+      const response = await loginUser(formData);
+      const userData = response?.data;
+      
+      // Update global auth state
+      login(userData);
+      
       navigate("/expenses/daily-expenses", { replace: true });
     } catch (error) {
       const errorMessage =
